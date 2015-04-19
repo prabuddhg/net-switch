@@ -1,0 +1,14 @@
+--
+interface:
+   - name: if01
+     mac: 00:00:00:00:00:01
+     state: up
+   - name: if02
+     mac: 00:00:00:00:00:02
+     state: down
+   - name: if03
+     mac: 00:00:00:00:00:03
+     state: up
+   - name: if04
+     mac: 00:00:00:00:00:04
+     state: down
