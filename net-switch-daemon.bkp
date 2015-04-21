@@ -1,4 +1,0 @@
-#!/usr/bin/python
-#export PATH=/Users/prabuddh/Desktop/mountCode/net-switch:$PATH
-#import net-switch-daemon
-python net-switch-daemon.py start
