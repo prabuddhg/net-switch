@@ -27,13 +27,17 @@ version = '1.0'
 usage = """usage: %prog [options] command [arg...]
 
 commands:
-  interfaces     interface commands
+  start     start the server daemon
+  stop      stop the server daemon
+  status    return server daemon status
+  echo      server echoes arguments
+  add A B   return A+B
 
 Example session:
-  %prog start           # starts daemon
-  %prog status          # print daemon's status
-  %prog interfaces       # show all interfaces
-  %prog stop            # stops daemon"""
+  %prog start     # starts daemon
+  %prog status    # print daemon's status
+  %prog add 15 8  # prints "15 + 8 = 23"
+  %prog stop      # stops daemon"""
 
 
 import SocketServer
@@ -45,7 +49,6 @@ import socket
 import sys
 import tempfile
 import time
-import switch.switch_init as switch_init
 
 # We can use either a TCPServer or a UnixStreamServer (assuming the OS
 # supports UNIX domain sockets).  We just need to define the
@@ -161,15 +164,10 @@ class RequestHandler(SocketServer.StreamRequestHandler):
         self.wfile.write('Server Log:        %s\n' % server_log)
 
 
-    def do_interfaces(self, *args):
+    def do_add(self, a, b):
         """Process an 'add' command"""
-        interface_usage = """
-    name     mac address
-    if01     00:00:00:00:00:01
-    if02     00:00:00:00:00:02
-    if03     00:00:00:00:00:03
-    if04     00:00:00:00:00:04"""
-        self.wfile.write('\n %s \n\n' % (interface_usage))
+        answer = int(a) + int(b)
+        self.wfile.write('%s + %s = %s\n' % (a, b, answer))
 
 
 class Server(ServerBase):
@@ -195,7 +193,6 @@ class Server(ServerBase):
         try:
             message = format % args
             timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
-            print "track log activities at %s" %(server_log)
             f = open(server_log, 'a+')
             f.write('%s %s\n' % (timestamp, message))
             f.close()
@@ -274,13 +271,6 @@ class Server(ServerBase):
 
 def run_server(options, args):
     """Run a server daemon in the current process."""
-    """http://stackoverflow.com/questions/17592394/how-to-make-a-python-file-run-without-py-extension"""
-    print 'Server Log:        %s' % server_log
-    init = switch_init.Switch_Init()
-    init.read_specification()
-    init.parse_specification()
-    init.acquire_resources()
-    init.store_objects()
     svr = Server(server_address)
     svr.serve_until_stopped()
     svr.server_close()

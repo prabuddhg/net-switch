@@ -22,4 +22,4 @@ def main():
     switch_init.acquire_resources()
     switch_init.store_objects()
 
-main()
+#main()
