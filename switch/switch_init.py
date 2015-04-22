@@ -1,4 +1,5 @@
-
+import os
+import yaml
 
 class Switch_Init():
     def __init__(self, spec=None):
@@ -7,19 +8,15 @@ class Switch_Init():
 
     def read_specification(self):
         print "Reading specification..."
+        dir = os.path.dirname(__file__)
+        # hardcoded the spec
+        filename =\
+            os.path.join(dir, '../specification/spec.yaml')
+        stream = open(filename, 'r')
+        print yaml.load(stream)
     def parse_specification(self):
         print "Parsing specification..."
     def acquire_resources(self):
         print "Acquiring resources..."
     def store_objects(self):
         print "Storing object..."
-
-def main():
-    #switch init process
-    switch_init = Switch_Init()
-    switch_init.read_specification()
-    switch_init.parse_specification()
-    switch_init.acquire_resources()
-    switch_init.store_objects()
-
-#main()

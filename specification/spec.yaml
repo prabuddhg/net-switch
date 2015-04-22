@@ -1,4 +1,3 @@
---
 interface:
    - name: if01
      mac: 00:00:00:00:00:01
