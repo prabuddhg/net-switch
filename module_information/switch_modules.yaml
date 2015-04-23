@@ -1,10 +1,4 @@
---
 interface:
-    schema:
-       name: 'if-<number>'
-       mac: '<mac address>'
-       state: '<up/down>'
-    class:
-       net-interface: 'interface/net_interface'
-    behavior:
-       crud: 'true'
+    net_interface:
+        module: 'net_interface'
+        name: 'NetInterface'

@@ -1,5 +1,10 @@
 import os
 import yaml
+import imp
+import interface.net_interface as net_interface
+
+moduleNames = ['interface']
+dir = os.path.dirname(__file__)
 
 class Switch_Init():
     def __init__(self, spec=None):
@@ -8,14 +13,30 @@ class Switch_Init():
 
     def read_specification(self):
         print "Reading specification..."
-        dir = os.path.dirname(__file__)
         # hardcoded the spec
-        filename =\
+        spec_yaml =\
             os.path.join(dir, '../specification/spec.yaml')
-        stream = open(filename, 'r')
-        print yaml.load(stream)
-    def parse_specification(self):
-        print "Parsing specification..."
+        stream = open(spec_yaml, 'r')
+        spec_dict = yaml.load(stream)
+        for module in moduleNames:
+            for sub_spec in spec_dict[module]:
+                self.parse_specification(module, sub_spec)
+
+    def parse_specification(self, module=None, spec=None):
+        print "Parsing specification for %s" %(spec['name'])
+        module_yaml =\
+            os.path.join(dir, '../module_information/switch_modules.yaml')
+        stream = open(module_yaml, 'r')
+        module_dict = yaml.load(stream)
+        # hardcoded switch module
+        class_type = spec['type']
+        module_file = module_dict[module][class_type]['module']
+        class_name = module_dict[module][class_type]['name']
+        print class_name
+        print module_file
+        module_object = net_interface.NetInterface(spec['name'], spec['mac'],spec['state'])
+        print module_object
+
     def acquire_resources(self):
         print "Acquiring resources..."
     def store_objects(self):

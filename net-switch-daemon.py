@@ -278,9 +278,6 @@ def run_server(options, args):
     print 'Server Log:        %s' % server_log
     init = switch_init.Switch_Init()
     init.read_specification()
-    init.parse_specification()
-    init.acquire_resources()
-    init.store_objects()
     svr = Server(server_address)
     svr.serve_until_stopped()
     svr.server_close()
