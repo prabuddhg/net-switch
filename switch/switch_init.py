@@ -2,6 +2,12 @@ import os
 import yaml
 import imp
 import interface.net_interface
+from kazoo.client import KazooClient
+import pickle
+import json
+
+zk = KazooClient(hosts='127.0.0.1:2181')
+zk.start()
 
 moduleNames = ['interface']
 dir = os.path.dirname(__file__)
@@ -34,18 +40,19 @@ class Switch_Init():
         module_file = (module + "." +
                       module_dict[module][class_type]['module'])
         class_name = module_dict[module][class_type]['name']
-        self.acquire_resources(module_file, class_name, spec)
+        self.acquire_resources(module, module_file, class_name, spec)
 
-    def acquire_resources(self, module_file = None, class_name = None, spec = None):
+    def acquire_resources(self, module=None, module_file=None, class_name=None, spec =None):
         print ("Acquiring resources using module_file: %s and class_name: %s"
                %(module_file, class_name))
-        print module_file
+        #print module_file
         as_class = self.get_class(module_file)
         # Make this dynamic
         module_object = as_class.NetInterface(spec['name'], spec['mac'],spec['state'])
-        print module_object
+        #print module_object
+        self.store_objects(module, spec['name'], module_object)
 
-    def get_class(self, kls = None):
+    def get_class(self, kls=None):
         parts = kls.split('.')
         module = ".".join(parts[:-1])
         m = __import__( module )
@@ -53,5 +60,19 @@ class Switch_Init():
             m = getattr(m, comp)
             return m
 
-    def store_objects(self):
+    def store_objects(self, module=None, name=None, object=None):
         print "Storing object..."
+        path = "/net-switch/%s/%s" %(module,name)
+        zk.ensure_path(path)
+        if zk.exists(path):
+            print "path exists: %s" %(path)
+
+        print "Store object at %s" %(path)
+        #zk.create(path, object)
+        byte_string = json.dumps(object.__dict__)
+        #zk.set(path, object.__dict__)
+        zk.set(path, byte_string)
+        data, stat = zk.get(path)
+        #zoo_data = pickle.loads(data)
+        print "Data from zookeeper"
+        print json.loads(data)
