@@ -56,7 +56,7 @@ import switch.switch_init as switch_init
 ServerBase = SocketServer.UnixStreamServer
 if ServerBase == SocketServer.TCPServer:
     # TODO: replace with appropriate port number
-    server_address = ('', 54545)
+    server_address = ('', 54444)
 elif ServerBase == SocketServer.UnixStreamServer:
     # TODO: replace with appropriate socket file path
     server_address = os.path.join(tempfile.gettempdir(), 'server_socket')

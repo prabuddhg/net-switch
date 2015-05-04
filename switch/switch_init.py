@@ -3,11 +3,29 @@ import yaml
 import imp
 import interface.net_interface
 from kazoo.client import KazooClient
-import pickle
+from kazoo.client import KazooState
 import json
 
-zk = KazooClient(hosts='127.0.0.1:2181')
+#zk = KazooClient(hosts='127.0.0.1:5001')
+#zk = KazooClient(hosts='127.0.0.1:5001', read_only=True)
+#zk.stop()
+#zk.start()
+
+import logging
+logging.basicConfig()
+from kazoo.client import KazooClient
+from kazoo.retry import KazooRetry
+_retry = KazooRetry(max_tries=1000, delay=0.5, backoff=2)
+zk = KazooClient(hosts="127.0.0.1:2181", logger=logging, read_only=True, timeout=30, connection_retry=_retry)
 zk.start()
+
+def my_listener(state):
+    if (state == KazooState.LOST):
+        print "Register somewhere that the session was lost"
+    elif (state == KazooState.SUSPENDED):
+        print "Handle being disconnected from Zookeeper"
+    else:
+        print "Handle being connected/reconnected to Zookeeper"
 
 moduleNames = ['interface']
 dir = os.path.dirname(__file__)
@@ -28,6 +46,8 @@ class Switch_Init():
         for module in moduleNames:
             for sub_spec in spec_dict[module]:
                 self.parse_specification(module, sub_spec)
+        zk.stop()
+        #zk.add_listener(my_listener)
 
     def parse_specification(self, module=None, spec=None):
         print "Parsing specification for %s" %(spec['name'])
@@ -65,8 +85,7 @@ class Switch_Init():
         path = "/net-switch/%s/%s" %(module,name)
         zk.ensure_path(path)
         if zk.exists(path):
-            print "path exists: %s" %(path)
-
+             print "path exists: %s" %(path)
         print "Store object at %s" %(path)
         #zk.create(path, object)
         byte_string = json.dumps(object.__dict__)
