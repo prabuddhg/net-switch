@@ -5,14 +5,16 @@ import interface.net_interface
 from kazoo.client import KazooClient
 from kazoo.client import KazooState
 import json
+import logging
+#logger = logging.getLogger(__name__)
 
 #zk = KazooClient(hosts='127.0.0.1:5001')
 #zk = KazooClient(hosts='127.0.0.1:5001', read_only=True)
 #zk.stop()
 #zk.start()
 
-import logging
-logging.basicConfig()
+
+#logging.basicConfig()
 from kazoo.client import KazooClient
 from kazoo.retry import KazooRetry
 _retry = KazooRetry(max_tries=1000, delay=0.5, backoff=2)
@@ -32,7 +34,7 @@ dir = os.path.dirname(__file__)
 
 class Switch_Init():
     def __init__(self, spec=None):
-        print "Start switch initialization"
+        logging.info("Start switch initialization")
         self.spec = spec
 
     def read_specification(self):

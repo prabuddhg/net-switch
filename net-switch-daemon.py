@@ -46,6 +46,10 @@ import sys
 import tempfile
 import time
 import switch.switch_init as switch_init
+import logging
+
+#logging.debug('So should this')
+#logging.warning('And this, too')
 
 # We can use either a TCPServer or a UnixStreamServer (assuming the OS
 # supports UNIX domain sockets).  We just need to define the
@@ -311,11 +315,21 @@ if __name__ == '__main__':
     optparser = optparse.OptionParser(usage=usage,
                                       version=version)
     (options, args) = optparser.parse_args()
-
+    print __name__
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler('/tmp/net-switch/run.log')
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    #logging.basicConfig(filename='/tmp/net-switch/run.log', filemode='w', level=logging.DEBUG)
+    #logger = logging.getLogger('server_logger')
+    logger.info('Log file created')
     if len(args) == 0:
         optparser.print_help()
         sys.exit(-1)
-
+ 
     if args[0] == 'start':
         run_server(options, args[1:])
     else:
